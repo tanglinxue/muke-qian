@@ -15,8 +15,12 @@ const service = axios.create({
   timeout: 8000
 })
 
+console.log(service)
+
 // 请求拦截
 service.interceptors.request.use((req) => {
+  console.log(req)
+  console.log('拦截咯')
   const headers = req.headers
   if (!headers.Authorization) {
     headers.Authorization = 'Bear Jack'
@@ -46,15 +50,21 @@ service.interceptors.response.use((res) => {
 })
 
 function request(options) {
+
   options.method = options.method || 'get';
+
   if (options.method.toLowerCase === 'get') {
     options.params = options.data;
   }
-  if (config.env === 'prod') {
-    options.defaults.baseURL = config.baseApi;
-  } else {
-    options.defaults.baseURL = config.mock ? config.mockApi : config.baseApi
+  if(typeof options.mock != 'undefined'){
+    config.mock = options.mock
   }
+  if (config.env === 'prod') {
+    service.defaults.baseURL = config.baseApi;
+  } else {
+    service.defaults.baseURL = config.mock ? config.mockApi : config.baseApi
+  }
+  console.log(options)
   return service(options)
 }
 

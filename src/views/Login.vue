@@ -3,16 +3,16 @@
 <template>
   <div class="login-wrapper">
     <div class="modal">
-      <el-form>
+      <el-form :model="user" status-icon :rules="rules" ref="userForm">
         <div class="title">火星</div>
-        <el-form-item>
-          <el-input type='text'  prefix-icon="el-icon-user"/>
+        <el-form-item prop="userName">
+          <el-input type='text' prefix-icon="user" v-model="user.userName" />
+        </el-form-item>
+        <el-form-item prop="userPwd">
+          <el-input type='password' prefix-icon="view" v-model="user.userPwd" />
         </el-form-item>
         <el-form-item>
-          <el-input type='password' prefix-icon="el-icon-view" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" class="btn-login">登录</el-button>
+          <el-button type="primary" class="btn-login" @click="login">登录</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -23,7 +23,43 @@
 
 export default {
   name: 'login',
+  data() {
+    return {
+      user: {
+        userName: '',
+        userPwd: ''
+      },
+      rules: {
+        userName: [
+          {
+            required: true,
+            message: "请输入用户名",
+            trigger: "blur",
+          },
+        ],
+        userPwd: [
+          {
+            required: true,
+            message: "请输入密码",
+            trigger: "blur",
+          },
+        ],
+      }
+    }
+  },
   methods: {
+    login() {
+      this.$refs.userForm.validate((valid)=>{
+        if(valid){
+          this.$api.login(this.user).then(res=>{
+            this.$store.commit('saveUserInfo',res)
+            this.$router.push('/welcome')
+          })
+        }else{
+          return false
+        }
+      })
+    },
     goHome() {
       this.$router.push('/welcome')
     }
